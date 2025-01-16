@@ -1,6 +1,8 @@
 package org.example.tms.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tms.exception.custom.AuthenticationManagerConfigurationException;
+import org.example.tms.exception.custom.UserNotFoundException;
 import org.example.tms.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +13,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.NoSuchElementException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class AuthenticationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("User with email: " + email + " not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with email: " + email + " not found"));
     }
 
     @Bean
@@ -39,7 +39,7 @@ public class AuthenticationConfig {
         try {
             return config.getAuthenticationManager();
         } catch (Exception ex) {
-            throw new IllegalStateException("Failed to configure AuthenticationManager", ex);
+            throw new AuthenticationManagerConfigurationException("Failed to configure AuthenticationManager", ex);
         }
     }
 

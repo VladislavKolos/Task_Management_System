@@ -1,7 +1,7 @@
 package org.example.tms.mapper;
 
-import org.example.tms.dto.requestdto.creating.CreatingUserRequestDto;
-import org.example.tms.dto.responsedto.UserResponseDto;
+import org.example.tms.dto.requests.create.CreateUserRequestDto;
+import org.example.tms.dto.responses.UserResponseDto;
 import org.example.tms.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,5 +13,5 @@ public interface UserMapper {
     UserResponseDto toUserResponseDto(User user);
 
     @Mapping(target = "id", ignore = true)
-    User toUserForCreate(CreatingUserRequestDto userRequestDto);
+    User toUserForCreate(CreateUserRequestDto userRequestDto);
 }

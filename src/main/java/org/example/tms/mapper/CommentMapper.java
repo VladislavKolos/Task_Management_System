@@ -1,7 +1,7 @@
 package org.example.tms.mapper;
 
-import org.example.tms.dto.requestdto.creating.CreatingCommentRequestDto;
-import org.example.tms.dto.responsedto.CommentResponseDto;
+import org.example.tms.dto.requests.create.CreateCommentRequestDto;
+import org.example.tms.dto.responses.CommentResponseDto;
 import org.example.tms.model.Comment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,5 +18,5 @@ public interface CommentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "taskId", target = "task.id")
     @Mapping(source = "authorId", target = "author.id")
-    Comment toCommentForCreate(CreatingCommentRequestDto commentRequestDto);
+    Comment toCommentForCreate(CreateCommentRequestDto commentRequestDto);
 }

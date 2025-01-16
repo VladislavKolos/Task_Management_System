@@ -1,7 +1,7 @@
 package org.example.tms.mapper;
 
-import org.example.tms.dto.requestdto.creating.CreatingTaskRequestDto;
-import org.example.tms.dto.responsedto.TaskResponseDto;
+import org.example.tms.dto.requests.create.CreateTaskRequestDto;
+import org.example.tms.dto.responses.TaskResponseDto;
 import org.example.tms.model.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,5 +16,5 @@ public interface TaskMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "authorId", target = "author.id")
-    Task toTaskForCreate(CreatingTaskRequestDto taskRequestDto);
+    Task toTaskForCreate(CreateTaskRequestDto taskRequestDto);
 }

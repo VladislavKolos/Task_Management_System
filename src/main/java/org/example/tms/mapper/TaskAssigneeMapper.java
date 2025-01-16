@@ -1,7 +1,7 @@
 package org.example.tms.mapper;
 
-import org.example.tms.dto.requestdto.creating.CreatingTaskAssigneeRequestDto;
-import org.example.tms.dto.responsedto.TaskAssigneeResponseDto;
+import org.example.tms.dto.requests.create.CreateTaskAssigneeRequestDto;
+import org.example.tms.dto.responses.TaskAssigneeResponseDto;
 import org.example.tms.model.TaskAssignee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,5 +18,5 @@ public interface TaskAssigneeMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "taskId", target = "task.id")
     @Mapping(source = "assigneeId", target = "assignee.id")
-    TaskAssignee toTaskAssigneeForCreate(CreatingTaskAssigneeRequestDto taskAssigneeRequestDto);
+    TaskAssignee toTaskAssigneeForCreate(CreateTaskAssigneeRequestDto taskAssigneeRequestDto);
 }
