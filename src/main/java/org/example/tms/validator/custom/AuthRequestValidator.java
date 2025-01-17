@@ -1,4 +1,4 @@
-package org.example.tms.validator;
+package org.example.tms.validator.custom;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

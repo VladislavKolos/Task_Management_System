@@ -1,0 +1,166 @@
+package org.example.tms.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.example.tms.annotation.ExecutionTime;
+import org.example.tms.dto.requests.create.CreateTaskRequestDto;
+import org.example.tms.dto.requests.update.UpdateTaskRequestDto;
+import org.example.tms.dto.responses.TaskResponseDto;
+import org.example.tms.exception.custom.EntitySaveException;
+import org.example.tms.exception.custom.TaskNotFoundException;
+import org.example.tms.mapper.TaskMapper;
+import org.example.tms.model.Comment;
+import org.example.tms.model.Task;
+import org.example.tms.model.TaskAssignee;
+import org.example.tms.model.User;
+import org.example.tms.model.enums.UserRole;
+import org.example.tms.repository.TaskRepository;
+import org.example.tms.service.TaskService;
+import org.example.tms.service.UserService;
+import org.example.tms.validator.PermissionValidator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class TaskServiceImpl implements TaskService {
+    private final TaskMapper taskMapper;
+    private final UserService userService;
+    private final TaskRepository taskRepository;
+    private final PermissionValidator permissionValidator;
+
+    @Override
+    @ExecutionTime
+    @Transactional(readOnly = true)
+    public Task getTaskEntityById(UUID id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+    }
+
+    @Override
+    @ExecutionTime
+    @Transactional(readOnly = true)
+    public TaskResponseDto getTaskById(UUID id) {
+        return taskRepository.findById(id)
+                .map(taskMapper::toTaskResponseDto)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+    }
+
+    @Override
+    @ExecutionTime
+    @Transactional(readOnly = true)
+    public Page<TaskResponseDto> getTasksByAuthor(UUID authorId, Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAllByAuthor_Id(authorId, pageable);
+        tasks.forEach(this::loadTaskAssociations);
+
+        return tasks.map(taskMapper::toTaskResponseDto);
+    }
+
+    @Override
+    @ExecutionTime
+    @Transactional(readOnly = true)
+    public Page<TaskResponseDto> getTasksByAssignee(UUID assigneeId, Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAllByTaskAssignees_Assignee_Id(assigneeId, pageable);
+        tasks.forEach(this::loadTaskAssociations);
+
+        return tasks.map(taskMapper::toTaskResponseDto);
+
+    }
+
+    @Override
+    @ExecutionTime
+    @Transactional(readOnly = true)
+    public Page<TaskResponseDto> getAllTasks(Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAllWithDetails(pageable);
+        tasks.forEach(this::loadTaskAssociations);
+
+        return tasks.map(taskMapper::toTaskResponseDto);
+    }
+
+    @Override
+    @Transactional
+    public TaskResponseDto createTask(CreateTaskRequestDto request) {
+        return Optional.of(request)
+                .map(taskMapper::toTaskForCreate)
+                .map(taskRepository::save)
+                .map(taskMapper::toTaskResponseDto)
+                .orElseThrow(() -> new EntitySaveException("Failed to save task."));
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteTask(UUID id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+
+        taskRepository.delete(task);
+    }
+
+    @Override
+    @Transactional
+    public void save(Task task) {
+        taskRepository.save(task);
+    }
+
+    @Override
+    @Transactional
+    public TaskResponseDto updateTask(UUID id, UpdateTaskRequestDto request, User currentUser) {
+        Task existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+
+        permissionValidator.validateAssigneePermission(currentUser, existingTask);
+
+        if (currentUser.getRole() == UserRole.ROLE_ADMIN) {
+            setTaskEntityForAdmin(existingTask, request);
+
+            return returnTaskResponseDtoValue(existingTask);
+        }
+
+        setTaskEntityForUser(existingTask, request);
+
+        return returnTaskResponseDtoValue(existingTask);
+    }
+
+    private TaskResponseDto returnTaskResponseDtoValue(Task task) {
+        return Optional.of(task)
+                .map(taskRepository::save)
+                .map(taskMapper::toTaskResponseDto)
+                .orElseThrow(() -> new EntitySaveException("Failed to save task."));
+    }
+
+    private void loadTaskAssociations(Task task) {
+        List<TaskAssignee> taskAssignees = taskRepository.fetchTaskWithTaskAssignees(task.getId());
+        task.setTaskAssignees(taskAssignees);
+
+        List<Comment> comments = taskRepository.fetchTaskWithComments(task.getId());
+        task.setComments(comments);
+    }
+
+    private void setTaskEntityForAdmin(Task task, UpdateTaskRequestDto request) {
+        setGeneralTaskEntity(task, request);
+        task.setAuthor(userService.getUserEntityById(request.getAuthorId()));
+        task.setCreatedAt(request.getCreatedAt() != null ? request.getCreatedAt() : LocalDateTime.now());
+        task.setUpdatedAt(request.getUpdatedAt() != null ? request.getUpdatedAt() : LocalDateTime.now());
+    }
+
+    private void setTaskEntityForUser(Task task, UpdateTaskRequestDto request) {
+        setGeneralTaskEntity(task, request);
+        task.setAuthor(task.getAuthor());
+        task.setCreatedAt(task.getCreatedAt());
+        task.setUpdatedAt(task.getUpdatedAt());
+    }
+
+    private void setGeneralTaskEntity(Task task, UpdateTaskRequestDto request) {
+        task.setTitle(request.getTitle());
+        task.setDescription(request.getDescription());
+        task.setStatus(request.getStatus());
+        task.setPriority(request.getPriority());
+    }
+}

@@ -3,8 +3,6 @@ package org.example.tms.dto.responses;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.tms.model.Comment;
-import org.example.tms.model.TaskAssignee;
 import org.example.tms.model.enums.TaskPriority;
 import org.example.tms.model.enums.TaskStatus;
 
@@ -22,8 +20,8 @@ public class TaskResponseDto {
     private TaskStatus status;
     private TaskPriority priority;
     private UserResponseDto author;
-    private List<TaskAssignee> taskAssignees;
+    private List<TaskAssigneeResponseDto> taskAssignees;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<Comment> comments;
+    private List<CommentResponseDto> comments;
 }

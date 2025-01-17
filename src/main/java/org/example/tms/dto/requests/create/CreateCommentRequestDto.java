@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.tms.annotation.custom.TaskExists;
 
 import java.util.UUID;
 
@@ -18,8 +19,6 @@ public class CreateCommentRequestDto {
     private String content;
 
     @NotNull
+    @TaskExists
     private UUID taskId;
-
-    @NotNull
-    private UUID authorId;
 }

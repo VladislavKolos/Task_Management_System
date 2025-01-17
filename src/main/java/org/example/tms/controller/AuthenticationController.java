@@ -22,23 +22,22 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<AuthenticationResponseDto> register(@Valid @RequestBody RegisterRequestDto request) {
-        AuthenticationResponseDto authResponseDTO = authenticationService.register(request);
+        AuthenticationResponseDto response = authenticationService.register(request);
 
         log.info("User registered successfully: {}", request.getEmail());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(authResponseDTO);
+                .body(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponseDto> authenticate(
             @Valid @RequestBody AuthenticationRequestDto request) {
-        AuthenticationResponseDto authResponseDTO = authenticationService.authenticate(request);
+        AuthenticationResponseDto response = authenticationService.authenticate(request);
 
         log.info("User successfully authenticated");
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(authResponseDTO);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
@@ -56,11 +55,10 @@ public class AuthenticationController {
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponseDto> refreshToken(
             @RequestHeader("X-Refresh-Token") String refreshToken) {
-        AuthenticationResponseDto authResponseDTO = authenticationService.refreshToken(refreshToken);
+        AuthenticationResponseDto response = authenticationService.refreshToken(refreshToken);
 
         log.info("Successfully refreshed token for User.");
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(authResponseDTO);
+        return ResponseEntity.ok(response);
     }
 }

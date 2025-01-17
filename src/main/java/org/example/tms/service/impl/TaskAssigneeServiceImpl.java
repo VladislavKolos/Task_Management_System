@@ -1,0 +1,48 @@
+package org.example.tms.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.example.tms.dto.requests.create.CreateTaskAssigneeRequestDto;
+import org.example.tms.dto.responses.TaskAssigneeResponseDto;
+import org.example.tms.exception.custom.TaskAssigneeNotFoundException;
+import org.example.tms.mapper.TaskAssigneeMapper;
+import org.example.tms.model.TaskAssignee;
+import org.example.tms.repository.TaskAssigneeRepository;
+import org.example.tms.service.TaskAssigneeService;
+import org.example.tms.service.TaskService;
+import org.example.tms.service.UserService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class TaskAssigneeServiceImpl implements TaskAssigneeService {
+    private final UserService userService;
+    private final TaskService taskService;
+    private final TaskAssigneeMapper taskAssigneeMapper;
+    private final TaskAssigneeRepository taskAssigneeRepository;
+
+
+    @Override
+    @Transactional
+    public TaskAssigneeResponseDto assignTaskToUser(CreateTaskAssigneeRequestDto request) {
+        TaskAssignee taskAssignee = buildTaskAssigneeEntity(request);
+
+        return Optional.of(taskAssignee)
+                .map(taskAssigneeRepository::save)
+                .map(taskAssigneeMapper::toTaskAssigneeResponseDto)
+                .orElseThrow(() -> new TaskAssigneeNotFoundException(
+                        "User and task not found with IDs: " + request.getAssigneeId() + " and " +
+                                request.getTaskId()));
+    }
+
+    private TaskAssignee buildTaskAssigneeEntity(CreateTaskAssigneeRequestDto request) {
+        return TaskAssignee.builder()
+                .task(taskService.getTaskEntityById(request.getTaskId()))
+                .assignee(userService.getUserEntityById(request.getAssigneeId()))
+                .assignedAt(request.getAssignedAt() != null ? request.getAssignedAt() : LocalDateTime.now())
+                .build();
+    }
+}

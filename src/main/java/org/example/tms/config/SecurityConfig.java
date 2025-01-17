@@ -6,6 +6,7 @@ import org.example.tms.exception.custom.SecurityFilterConfigurationException;
 import org.example.tms.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,6 +30,22 @@ public class SecurityConfig {
                     .authorizeHttpRequests(auth ->
                             auth.requestMatchers("/api/auth/**")
                                     .permitAll()
+                                    .requestMatchers(HttpMethod.POST, "/api/tasks")
+                                    .hasRole("ADMIN")
+                                    .requestMatchers(HttpMethod.DELETE, "/api/tasks/**")
+                                    .hasRole("ADMIN")
+                                    .requestMatchers(HttpMethod.GET, "/api/tasks/**")
+                                    .authenticated()
+                                    .requestMatchers(HttpMethod.PUT, "/api/tasks/**")
+                                    .authenticated()
+                                    .requestMatchers(HttpMethod.POST, "/api/tasks-assignees/**")
+                                    .hasRole("ADMIN")
+                                    .requestMatchers(HttpMethod.GET, "/api/comments/**")
+                                    .authenticated()
+                                    .requestMatchers(HttpMethod.POST, "/api/comments")
+                                    .authenticated()
+                                    .requestMatchers(HttpMethod.DELETE, "/api/comments/**")
+                                    .authenticated()
                                     .anyRequest()
                                     .authenticated())
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

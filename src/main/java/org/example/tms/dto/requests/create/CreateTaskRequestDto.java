@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.tms.annotation.custom.UserExists;
+import org.example.tms.annotation.custom.ValidTimestamp;
 import org.example.tms.model.enums.TaskPriority;
 import org.example.tms.model.enums.TaskStatus;
 
@@ -30,6 +32,9 @@ public class CreateTaskRequestDto {
     private TaskPriority priority;
 
     @NotNull
+    @UserExists
     private UUID authorId;
+
+    @ValidTimestamp(message = "CreatedAt timestamp cannot be in the future")
     private LocalDateTime createdAt;
 }

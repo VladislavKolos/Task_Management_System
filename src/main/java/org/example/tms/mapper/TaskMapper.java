@@ -7,11 +7,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(componentModel = "spring", uses = {TaskAssigneeMapper.class,
+        CommentMapper.class})
 @Component
 public interface TaskMapper {
 
     @Mapping(source = "author", target = "author")
+    @Mapping(source = "taskAssignees", target = "taskAssignees")
+    @Mapping(source = "comments", target = "comments")
     TaskResponseDto toTaskResponseDto(Task task);
 
     @Mapping(target = "id", ignore = true)
