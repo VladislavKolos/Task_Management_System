@@ -39,7 +39,7 @@ public class TaskManagementSystemExceptionHandler {
 
         log.error("Method execution failed at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR,
+        return buildExceptionResponse(new MethodExecutionException(message), HttpStatus.INTERNAL_SERVER_ERROR,
                 getRequestPath(request), "Method Execution Error");
     }
 
@@ -51,7 +51,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.error("Failed to save object at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
+        return buildExceptionResponse(new EntitySaveException(message), HttpStatus.INTERNAL_SERVER_ERROR,
+                getRequestPath(request),
                 "Entity Save Error");
     }
 
@@ -63,7 +64,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("Permission denied at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.FORBIDDEN, getRequestPath(request),
+        return buildExceptionResponse(new PermissionDeniedException(message), HttpStatus.FORBIDDEN,
+                getRequestPath(request),
                 "Access Denied");
     }
 
@@ -75,7 +77,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.error("Error at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
+        return buildExceptionResponse(new AuthenticationManagerConfigurationException(message),
+                HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
                 "Unexpected Error");
     }
 
@@ -87,7 +90,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("Blacklisted token access attempt at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.FORBIDDEN, getRequestPath(request),
+        return buildExceptionResponse(new BlacklistedTokenAccessDeniedException(message), HttpStatus.FORBIDDEN,
+                getRequestPath(request),
                 "Invalid Session");
     }
 
@@ -99,7 +103,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("Invalid refresh token used at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.UNAUTHORIZED, getRequestPath(request),
+        return buildExceptionResponse(new InvalidRefreshTokenException(message), HttpStatus.UNAUTHORIZED,
+                getRequestPath(request),
                 "Session Error");
     }
 
@@ -111,7 +116,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.error("Authentication error at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.UNAUTHORIZED, getRequestPath(request),
+        return buildExceptionResponse(new JwtAuthenticationException(message), HttpStatus.UNAUTHORIZED,
+                getRequestPath(request),
                 "Authentication Error");
     }
 
@@ -123,7 +129,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.error("Null user object encountered at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
+        return buildExceptionResponse(new NullUserObjectException(message), HttpStatus.INTERNAL_SERVER_ERROR,
+                getRequestPath(request),
                 "Unexpected Error");
     }
 
@@ -135,7 +142,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.error("Security filter configuration error at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
+        return buildExceptionResponse(new SecurityFilterConfigurationException(message),
+                HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
                 "Unexpected Error");
     }
 
@@ -147,7 +155,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("Unauthenticated access attempt at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.UNAUTHORIZED, getRequestPath(request),
+        return buildExceptionResponse(new UnauthenticatedClientAccessException(message), HttpStatus.UNAUTHORIZED,
+                getRequestPath(request),
                 "Access Denied");
     }
 
@@ -159,7 +168,7 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("User not found at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.NOT_FOUND, getRequestPath(request),
+        return buildExceptionResponse(new UserNotFoundException(message), HttpStatus.NOT_FOUND, getRequestPath(request),
                 "Resource Not Found");
     }
 
@@ -171,7 +180,7 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("Task not found at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.NOT_FOUND, getRequestPath(request),
+        return buildExceptionResponse(new TaskNotFoundException(message), HttpStatus.NOT_FOUND, getRequestPath(request),
                 "Resource Not Found");
     }
 
@@ -183,7 +192,8 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("Comment not found at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.NOT_FOUND, getRequestPath(request),
+        return buildExceptionResponse(new CommentNotFoundException(message), HttpStatus.NOT_FOUND,
+                getRequestPath(request),
                 "Resource Not Found");
     }
 
@@ -195,9 +205,31 @@ public class TaskManagementSystemExceptionHandler {
 
         log.warn("TaskAssignee not found at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.NOT_FOUND, getRequestPath(request),
+        return buildExceptionResponse(new TaskAssigneeNotFoundException(message), HttpStatus.NOT_FOUND,
+                getRequestPath(request),
                 "Resource Not Found");
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiException> handleGeneralException(Exception ex, WebRequest request) {
+        String message = "An unexpected error occurred. Please try again later or contact support: " + supportEmail;
+
+        log.error("Unexpected error occurred at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
+
+        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
+                "Unexpected Error");
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiException> handleRuntimeException(RuntimeException ex, WebRequest request) {
+        String message = "A runtime error occurred. Please try again later or contact support: " + supportEmail;
+
+        log.error("Runtime exception occurred at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
+
+        return buildExceptionResponse(new RuntimeException(message), HttpStatus.INTERNAL_SERVER_ERROR,
+                getRequestPath(request), "Runtime Error");
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiException> handleValidationErrors(MethodArgumentNotValidException ex, WebRequest request) {
