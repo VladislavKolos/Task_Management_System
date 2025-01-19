@@ -1,11 +1,13 @@
 package org.example.tms.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import lombok.Setter;
 import org.example.tms.util.ConstantUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Getter
+@Setter
 @Service
 public class JwtService {
 
@@ -52,7 +55,11 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token, String key) {
-        return extractExpiration(token, key).before(new Date());
+        try {
+            return extractExpiration(token, key).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
     private Date extractExpiration(String token, String key) {

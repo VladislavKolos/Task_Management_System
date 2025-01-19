@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, RegisterRequestDto> {
     private final UserRepository userRepository;
 
-
     @Override
     public boolean isValid(RegisterRequestDto registerRequestDto,
                            ConstraintValidatorContext constraintValidatorContext) {
