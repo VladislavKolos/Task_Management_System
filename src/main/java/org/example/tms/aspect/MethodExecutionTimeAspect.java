@@ -12,6 +12,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MethodExecutionTimeAspect {
 
+    /**
+     * Logs the execution time of methods annotated with @ExecutionTime.
+     *
+     * @param proceedingJoinPoint The join point representing the method execution.
+     * @return The result of the method execution.
+     * @throws MethodExecutionException If the method execution fails.
+     */
     @Around("@annotation(org.example.tms.annotation.ExecutionTime)")
     public Object logExecutionTime(ProceedingJoinPoint proceedingJoinPoint) {
         long startTime = System.currentTimeMillis();

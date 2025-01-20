@@ -27,23 +27,30 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class JwtAuthenticationFilterTest {
-
     private static final String ACCESS_TOKEN = "validAccessToken";
     private static final String USERNAME = "testUser";
+
     @InjectMocks
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Mock
     private JwtService jwtService;
+
     @Mock
     private UserDetails userDetails;
+
     @Mock
     private FilterChain filterChain;
+
     @Mock
     private HttpServletRequest request;
+
     @Mock
     private HttpServletResponse response;
+
     @Mock
     private UserDetailsService userDetailsService;
+
     @Mock
     private JwtBlacklistService jwtBlacklistService;
 

@@ -1,5 +1,7 @@
 package org.example.tms.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
+@Tag(name = "Task Assignees", description = "Endpoints for managing task assignments to Users")
 @Slf4j
 @RestController
 @RequestMapping("/api/tasks-assignees")
@@ -21,6 +24,11 @@ import java.net.URI;
 public class TaskAssigneeController {
     private final TaskAssigneeService taskAssigneeService;
 
+    @Operation(
+            summary = "Assign a task to a user",
+            description = "Assigns a task to a specific user by providing the task ID and the assignee user ID.",
+            tags = {"Task Assignees"}
+    )
     @PostMapping
     public ResponseEntity<TaskAssigneeResponseDto> assignTaskToUser(
             @Valid @RequestBody CreateTaskAssigneeRequestDto request) {

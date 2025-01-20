@@ -24,10 +24,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceTest {
-
     private static final String EMAIL = "user@example.com";
     private static final String PASSWORD = "password123";
     private static final String REFRESH_TOKEN = "refreshToken";
+
     private static final User user = User.builder()
             .email(EMAIL)
             .password(PASSWORD)
@@ -46,14 +46,19 @@ public class AuthenticationServiceTest {
             .token("accessToken")
             .refreshToken("refreshToken")
             .build();
+
     @InjectMocks
     private AuthenticationService authenticationService;
+
     @Mock
     private JwtService jwtService;
+
     @Mock
     private UserService userService;
+
     @Mock
     private PasswordEncoder passwordEncoder;
+
     @Mock
     private AuthenticationManager authenticationManager;
 

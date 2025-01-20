@@ -1,5 +1,8 @@
 package org.example.tms.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Authentication", description = "Endpoints for User authentication and token management")
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
@@ -20,6 +24,11 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final JwtBlacklistService jwtBlacklistService;
 
+    @Operation(
+            summary = "User registration",
+            description = "Registers a new User and returns an authentication response.",
+            tags = {"Authentication"}
+    )
     @PostMapping("/signup")
     public ResponseEntity<AuthenticationResponseDto> register(@Valid @RequestBody RegisterRequestDto request) {
         AuthenticationResponseDto response = authenticationService.register(request);
@@ -30,6 +39,11 @@ public class AuthenticationController {
                 .body(response);
     }
 
+    @Operation(
+            summary = "User login",
+            description = "Authenticates a User and returns an authentication response.",
+            tags = {"Authentication"}
+    )
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponseDto> authenticate(
             @Valid @RequestBody AuthenticationRequestDto request) {
@@ -40,6 +54,17 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "User logout",
+            description = "Logs out the User by adding the token to the blacklist.",
+            tags = {"Authentication"}
+    )
+    @Parameter(
+            name = "Authorization",
+            description = "JWT token of the authenticated User",
+            required = true,
+            example = "Bearer <your_token>"
+    )
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
         String tokenValue = token.substring(7);
@@ -52,6 +77,17 @@ public class AuthenticationController {
                 .build();
     }
 
+    @Operation(
+            summary = "Refresh token",
+            description = "Refreshes the User's JWT using a valid refresh token.",
+            tags = {"Authentication"}
+    )
+    @Parameter(
+            name = "X-Refresh-Token",
+            description = "The refresh token for the User",
+            required = true,
+            example = "<your_refresh_token>"
+    )
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponseDto> refreshToken(
             @RequestHeader("X-Refresh-Token") String refreshToken) {

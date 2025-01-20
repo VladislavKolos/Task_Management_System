@@ -44,27 +44,35 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceImplTest {
-
     private static final UUID TASK_ID = UUID.randomUUID();
     private static final UUID COMMENT_ID = UUID.randomUUID();
     private static final UUID AUTHOR_ID = UUID.randomUUID();
     private static final UUID CURRENT_USER_ID = UUID.randomUUID();
+
     @InjectMocks
     private CommentServiceImpl commentService;
+
     @Mock
     private UserService userService;
+
     @Mock
     private TaskService taskService;
+
     @Mock
     private CommentMapper commentMapper;
+
     @Mock
     private Authentication authentication;
+
     @Mock
     private SecurityContext securityContext;
+
     @Mock
     private CommentRepository commentRepository;
+
     @Mock
     private PermissionValidator permissionValidator;
+
     private Comment comment;
     private CommentResponseDto commentResponseDto;
     private CreateCommentRequestDto createCommentRequestDto;

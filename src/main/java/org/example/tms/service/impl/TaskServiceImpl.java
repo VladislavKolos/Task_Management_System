@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service implementation for managing tasks.
+ * Provides functionality to create, update, delete and retrieve tasks with support for paginated results
+ * and permission validation.
+ */
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -35,6 +40,13 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final PermissionValidator permissionValidator;
 
+    /**
+     * Retrieves a task entity by its ID.
+     *
+     * @param id the unique identifier of the task
+     * @return the {@link Task} entity
+     * @throws TaskNotFoundException if the task is not found
+     */
     @Override
     @ExecutionTime
     @Transactional(readOnly = true)
@@ -43,6 +55,13 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
     }
 
+    /**
+     * Retrieves task details as a DTO by its ID.
+     *
+     * @param id the unique identifier of the task
+     * @return a {@link TaskResponseDto} containing task details
+     * @throws TaskNotFoundException if the task is not found
+     */
     @Override
     @ExecutionTime
     @Transactional(readOnly = true)
@@ -52,6 +71,13 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
     }
 
+    /**
+     * Retrieves paginated tasks authored by a specific user.
+     *
+     * @param authorId the unique identifier of the author
+     * @param pageable pagination information
+     * @return a {@link Page} of {@link TaskResponseDto}
+     */
     @Override
     @ExecutionTime
     @Transactional(readOnly = true)
@@ -62,6 +88,13 @@ public class TaskServiceImpl implements TaskService {
         return tasks.map(taskMapper::toTaskResponseDto);
     }
 
+    /**
+     * Retrieves paginated tasks assigned to a specific user.
+     *
+     * @param assigneeId the unique identifier of the assignee
+     * @param pageable   pagination information
+     * @return a {@link Page} of {@link TaskResponseDto}
+     */
     @Override
     @ExecutionTime
     @Transactional(readOnly = true)
@@ -73,6 +106,12 @@ public class TaskServiceImpl implements TaskService {
 
     }
 
+    /**
+     * Retrieves all tasks with pagination support.
+     *
+     * @param pageable pagination information
+     * @return a {@link Page} of {@link TaskResponseDto}
+     */
     @Override
     @ExecutionTime
     @Transactional(readOnly = true)
@@ -83,6 +122,13 @@ public class TaskServiceImpl implements TaskService {
         return tasks.map(taskMapper::toTaskResponseDto);
     }
 
+    /**
+     * Creates a new task based on the provided request data.
+     *
+     * @param request the {@link CreateTaskRequestDto} containing task details
+     * @return a {@link TaskResponseDto} with the created task's details
+     * @throws EntitySaveException if the task could not be saved
+     */
     @Override
     @Transactional
     public TaskResponseDto createTask(CreateTaskRequestDto request) {
@@ -93,7 +139,12 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new EntitySaveException("Failed to save task."));
     }
 
-
+    /**
+     * Deletes a task by its ID.
+     *
+     * @param id the unique identifier of the task
+     * @throws TaskNotFoundException if the task is not found
+     */
     @Override
     @Transactional
     public void deleteTask(UUID id) {
@@ -103,12 +154,27 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.delete(task);
     }
 
+    /**
+     * Saves a task entity directly to the database.
+     *
+     * @param task the {@link Task} entity to save
+     */
     @Override
     @Transactional
     public void save(Task task) {
         taskRepository.save(task);
     }
 
+    /**
+     * Updates an existing task with new details based on user permissions.
+     *
+     * @param id          the unique identifier of the task
+     * @param request     the {@link UpdateTaskRequestDto} containing updated task details
+     * @param currentUser the user attempting the update
+     * @return a {@link TaskResponseDto} with updated task details
+     * @throws TaskNotFoundException if the task is not found
+     * @throws EntitySaveException   if the task could not be saved
+     */
     @Override
     @Transactional
     public TaskResponseDto updateTask(UUID id, UpdateTaskRequestDto request, User currentUser) {
@@ -135,6 +201,11 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new EntitySaveException("Failed to save task."));
     }
 
+    /**
+     * Loads task associations such as assignees and comments for a task.
+     *
+     * @param task the {@link Task} entity whose associations should be loaded
+     */
     private void loadTaskAssociations(Task task) {
         List<TaskAssignee> taskAssignees = taskRepository.fetchTaskWithTaskAssignees(task.getId());
         task.setTaskAssignees(taskAssignees);

@@ -125,7 +125,7 @@ public class TaskManagementSystemExceptionHandler {
     public ResponseEntity<ApiException> handleNullUserObjectException(
             NullUserObjectException ex, WebRequest request) {
 
-        String message = "An unexpected error occurred. Please try again later.";
+        String message = "The user object is null. Please ensure all required data is provided.";
 
         log.error("Null user object encountered at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 

@@ -24,6 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service implementation for managing comments.
+ * Provides methods for CRUD operations on comments and validation logic.
+ */
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
@@ -33,7 +37,13 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PermissionValidator permissionValidator;
 
-
+    /**
+     * Retrieves a comment by its ID.
+     *
+     * @param id the UUID of the comment
+     * @return the corresponding {@link CommentResponseDto}
+     * @throws CommentNotFoundException if no comment is found with the given ID
+     */
     @Override
     @ExecutionTime
     @Transactional(readOnly = true)
@@ -43,6 +53,13 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + id));
     }
 
+    /**
+     * Retrieves a paginated list of comments for a specific task.
+     *
+     * @param taskId   the UUID of the task
+     * @param pageable pagination information
+     * @return a paginated list of {@link CommentResponseDto}
+     */
     @Override
     @ExecutionTime
     @Transactional(readOnly = true)
@@ -51,6 +68,13 @@ public class CommentServiceImpl implements CommentService {
                 .map(commentMapper::toCommentResponseDto);
     }
 
+    /**
+     * Adds a new comment to a task.
+     *
+     * @param request the {@link CreateCommentRequestDto} containing comment details
+     * @return the saved {@link CommentResponseDto}
+     * @throws EntitySaveException if saving the comment fails
+     */
     @Override
     @Transactional
     public CommentResponseDto addComment(CreateCommentRequestDto request) {
@@ -68,6 +92,12 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new EntitySaveException("Failed to save comment."));
     }
 
+    /**
+     * Deletes a comment by its ID.
+     *
+     * @param id the UUID of the comment to delete
+     * @throws CommentNotFoundException if no comment is found with the given ID
+     */
     @Override
     @Transactional
     public void deleteComment(UUID id) {
@@ -80,6 +110,13 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.delete(comment);
     }
 
+    /**
+     * Builds a {@link Comment} entity from the request DTO and the current User.
+     *
+     * @param request     the {@link CreateCommentRequestDto} containing comment details
+     * @param currentUser the current logged-in {@link User}
+     * @return the constructed {@link Comment} entity
+     */
     private Comment buildCommentEntity(CreateCommentRequestDto request, User currentUser) {
         return Comment.builder()
                 .content(request.getContent())

@@ -46,6 +46,8 @@ public class SecurityConfig {
                                     .authenticated()
                                     .requestMatchers(HttpMethod.DELETE, "/api/comments/**")
                                     .authenticated()
+                                    .requestMatchers("/swagger-ui/**", "/api-docs/**")
+                                    .permitAll()
                                     .anyRequest()
                                     .authenticated())
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

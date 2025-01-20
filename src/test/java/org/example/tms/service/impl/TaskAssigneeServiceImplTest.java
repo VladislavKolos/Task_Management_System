@@ -34,19 +34,24 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskAssigneeServiceImplTest {
-
     private static final UUID ASSIGNEE_ID = UUID.randomUUID();
     private static final UUID TASK_ID = UUID.randomUUID();
+
     @InjectMocks
     private TaskAssigneeServiceImpl taskAssigneeService;
+
     @Mock
     private UserService userService;
+
     @Mock
     private TaskService taskService;
+
     @Mock
     private TaskAssigneeMapper taskAssigneeMapper;
+
     @Mock
     private TaskAssigneeRepository taskAssigneeRepository;
+
     private Task task;
     private User user;
     private CreateTaskAssigneeRequestDto createTaskAssigneeRequestDto;

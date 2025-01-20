@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing task assignments to Users.
+ * Provides functionality to assign tasks to Users and retrieve assignment details.
+ */
 @Service
 @RequiredArgsConstructor
 public class TaskAssigneeServiceImpl implements TaskAssigneeService {
@@ -24,7 +28,13 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
     private final TaskAssigneeMapper taskAssigneeMapper;
     private final TaskAssigneeRepository taskAssigneeRepository;
 
-
+    /**
+     * Assigns a task to a User based on the provided request data.
+     *
+     * @param request the request data containing task and assignee details
+     * @return a {@link TaskAssigneeResponseDto} with the details of the task assignment
+     * @throws TaskAssigneeNotFoundException if the User or task with the specified IDs is not found
+     */
     @Override
     @Transactional
     public TaskAssigneeResponseDto assignTaskToUser(CreateTaskAssigneeRequestDto request) {
@@ -38,6 +48,12 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
                                 request.getTaskId()));
     }
 
+    /**
+     * Builds a {@link TaskAssignee} entity from the provided request data.
+     *
+     * @param request the request data containing task and assignee details
+     * @return the constructed {@link TaskAssignee} entity
+     */
     private TaskAssignee buildTaskAssigneeEntity(CreateTaskAssigneeRequestDto request) {
         return TaskAssignee.builder()
                 .task(taskService.getTaskEntityById(request.getTaskId()))

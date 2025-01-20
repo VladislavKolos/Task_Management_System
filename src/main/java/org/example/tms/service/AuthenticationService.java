@@ -15,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+/**
+ * Service for handling User authentication and registration.
+ * Provides methods for registering a User, authenticating a User and refreshing authentication tokens.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -24,6 +28,12 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Registers a new User and generates authentication tokens.
+     *
+     * @param request the {@link RegisterRequestDto} containing User registration details
+     * @return the {@link AuthenticationResponseDto} containing the generated tokens
+     */
     @Transactional
     public AuthenticationResponseDto register(RegisterRequestDto request) {
         User user = buildUser(request);
@@ -32,6 +42,12 @@ public class AuthenticationService {
         return createAuthenticationResponse(user);
     }
 
+    /**
+     * Authenticates a User by email and password and generates authentication tokens.
+     *
+     * @param request the {@link AuthenticationRequestDto} containing login details
+     * @return the {@link AuthenticationResponseDto} containing the generated tokens
+     */
     @Transactional
     public AuthenticationResponseDto authenticate(AuthenticationRequestDto request) {
         authenticationManager.authenticate(
@@ -42,6 +58,13 @@ public class AuthenticationService {
         return createAuthenticationResponse(user);
     }
 
+    /**
+     * Refreshes the authentication tokens using a valid refresh token.
+     *
+     * @param refreshToken the refresh token to validate and use for generating new tokens
+     * @return the {@link AuthenticationResponseDto} containing the new tokens
+     * @throws InvalidRefreshTokenException if the refresh token is invalid
+     */
     @Transactional
     public AuthenticationResponseDto refreshToken(String refreshToken) {
         String username = jwtService.extractUsername(refreshToken, jwtService.getRefreshSecretKey());
@@ -54,6 +77,12 @@ public class AuthenticationService {
         return createAuthenticationResponse(user);
     }
 
+    /**
+     * Creates authentication response containing access and refresh tokens.
+     *
+     * @param user the authenticated {@link User} to generate tokens for
+     * @return the {@link AuthenticationResponseDto} containing access and refresh tokens
+     */
     private AuthenticationResponseDto createAuthenticationResponse(User user) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -64,6 +93,12 @@ public class AuthenticationService {
                 .build();
     }
 
+    /**
+     * Builds a new {@link User} entity from the registration request DTO.
+     *
+     * @param request the {@link RegisterRequestDto} containing User details
+     * @return the constructed {@link User} entity
+     */
     private User buildUser(RegisterRequestDto request) {
         return User.builder()
                 .email(request.getEmail())

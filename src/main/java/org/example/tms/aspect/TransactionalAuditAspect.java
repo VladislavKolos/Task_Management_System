@@ -15,6 +15,13 @@ import java.sql.SQLException;
 @Component
 public class TransactionalAuditAspect {
 
+    /**
+     * Logs the execution of transactional methods and handles exceptions thrown during their execution.
+     *
+     * @param proceedingJoinPoint The join point representing the method execution.
+     * @return The result of the method execution.
+     * @throws TransactionExecutionException If any exceptions related to transaction execution occur.
+     */
     @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
     public Object logTransactionalAudit(ProceedingJoinPoint proceedingJoinPoint) {
         String methodName = proceedingJoinPoint.getSignature()
@@ -30,22 +37,18 @@ public class TransactionalAuditAspect {
 
         } catch (SQLException e) {
             log.error("SQL Exception occurred while executing method {}: {}", methodName, e.getMessage(), e);
-
             throw new TransactionExecutionException("Database error while executing method: " + methodName, e);
 
         } catch (IOException e) {
             log.error("I/O Exception occurred while executing method {}: {}", methodName, e.getMessage(), e);
-
             throw new TransactionExecutionException("I/O error while executing method: " + methodName, e);
 
         } catch (Exception e) {
             log.error("Exception occurred while executing method {}: {}", methodName, e.getMessage(), e);
-
             throw new TransactionExecutionException("Error occurred while executing method: " + methodName, e);
 
         } catch (Throwable e) {
             log.error("Unexpected error occurred while executing method {}: {}", methodName, e.getMessage(), e);
-
             throw new RuntimeException("Unexpected error while executing method: " + methodName, e);
         }
     }
