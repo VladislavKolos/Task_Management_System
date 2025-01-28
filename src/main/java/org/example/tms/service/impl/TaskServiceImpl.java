@@ -1,12 +1,12 @@
 package org.example.tms.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tms.annotation.ExecutionTime;
+import org.example.tms.aspect.logging.annotation.ExecutionTime;
 import org.example.tms.dto.requests.create.CreateTaskRequestDto;
 import org.example.tms.dto.requests.update.UpdateTaskRequestDto;
 import org.example.tms.dto.responses.TaskResponseDto;
-import org.example.tms.exception.custom.EntitySaveException;
-import org.example.tms.exception.custom.TaskNotFoundException;
+import org.example.tms.exception.EntitySaveException;
+import org.example.tms.exception.TaskNotFoundException;
 import org.example.tms.mapper.TaskMapper;
 import org.example.tms.model.Comment;
 import org.example.tms.model.Task;
@@ -52,7 +52,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional(readOnly = true)
     public Task getTaskEntityById(UUID id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     /**
@@ -68,7 +68,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponseDto getTaskById(UUID id) {
         return taskRepository.findById(id)
                 .map(taskMapper::toTaskResponseDto)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
     /**
@@ -136,7 +136,7 @@ public class TaskServiceImpl implements TaskService {
                 .map(taskMapper::toTaskForCreate)
                 .map(taskRepository::save)
                 .map(taskMapper::toTaskResponseDto)
-                .orElseThrow(() -> new EntitySaveException("Failed to save task."));
+                .orElseThrow(() -> new EntitySaveException(EntitySaveException.ErrorType.TASK_SAVE_ERROR));
     }
 
     /**
@@ -149,7 +149,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public void deleteTask(UUID id) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+                .orElseThrow(() -> new TaskNotFoundException(id));
 
         taskRepository.delete(task);
     }
@@ -179,26 +179,26 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public TaskResponseDto updateTask(UUID id, UpdateTaskRequestDto request, User currentUser) {
         Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found with ID: " + id));
+                .orElseThrow(() -> new TaskNotFoundException(id));
 
         permissionValidator.validateAssigneePermission(currentUser, existingTask);
 
         if (currentUser.getRole() == UserRole.ROLE_ADMIN) {
             setTaskEntityForAdmin(existingTask, request);
 
-            return returnTaskResponseDtoValue(existingTask);
+            return saveAndConvertToDto(existingTask);
         }
 
         setTaskEntityForUser(existingTask, request);
 
-        return returnTaskResponseDtoValue(existingTask);
+        return saveAndConvertToDto(existingTask);
     }
 
-    private TaskResponseDto returnTaskResponseDtoValue(Task task) {
+    private TaskResponseDto saveAndConvertToDto(Task task) {
         return Optional.of(task)
                 .map(taskRepository::save)
                 .map(taskMapper::toTaskResponseDto)
-                .orElseThrow(() -> new EntitySaveException("Failed to save task."));
+                .orElseThrow(() -> new EntitySaveException(EntitySaveException.ErrorType.TASK_SAVE_ERROR));
     }
 
     /**

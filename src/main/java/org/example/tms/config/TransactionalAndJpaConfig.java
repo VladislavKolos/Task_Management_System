@@ -1,9 +1,11 @@
 package org.example.tms.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.tms.properties.DataSourceProperties;
+import org.example.tms.properties.HibernateProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -14,8 +16,10 @@ import java.util.Properties;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties({DataSourceProperties.class, HibernateProperties.class})
 public class TransactionalAndJpaConfig {
-    private final Environment env;
+    private final HibernateProperties hibernateProperties;
+    private final DataSourceProperties dataSourceProperties;
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
@@ -31,15 +35,13 @@ public class TransactionalAndJpaConfig {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        String driverClassName = env.getProperty("spring.datasource.driver-class-name");
+        dataSource.setUrl(dataSourceProperties.getUrl());
+        dataSource.setUsername(dataSourceProperties.getUsername());
+        dataSource.setPassword(dataSourceProperties.getPassword());
 
-        if (driverClassName != null) {
-            dataSource.setDriverClassName(driverClassName);
+        if (dataSourceProperties.getDriverClassName() != null) {
+            dataSource.setDriverClassName(dataSourceProperties.getDriverClassName());
         }
-
-        dataSource.setUrl(env.getProperty("spring.datasource.url"));
-        dataSource.setUsername(env.getProperty("spring.datasource.username"));
-        dataSource.setPassword(env.getProperty("spring.datasource.password"));
 
         return dataSource;
     }
@@ -52,10 +54,6 @@ public class TransactionalAndJpaConfig {
     }
 
     private Properties hibernateProperties() {
-        Properties properties = new Properties();
-        properties.put("hibernate.dialect", env.getProperty("spring.jpa.properties.hibernate.dialect"));
-        properties.put("hibernate.show_sql", env.getProperty("spring.jpa.show-sql"));
-        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
-        return properties;
+        return hibernateProperties.toProperties();
     }
 }

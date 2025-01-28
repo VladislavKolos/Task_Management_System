@@ -1,6 +1,6 @@
 package org.example.tms.validator;
 
-import org.example.tms.exception.custom.PermissionDeniedException;
+import org.example.tms.exception.PermissionDeniedException;
 import org.example.tms.model.Comment;
 import org.example.tms.model.Task;
 import org.example.tms.model.User;
@@ -36,7 +36,8 @@ public class PermissionValidator {
                         .equals(user.getId()));
 
         if (!isAssignee) {
-            throw new PermissionDeniedException("User with ID: " + user.getId() + " - is not an assignee of the task.");
+            throw new PermissionDeniedException(PermissionDeniedException.ErrorType.USER_NOT_ASSIGNEE_OF_TASK,
+                    user.getId());
         }
     }
 
@@ -56,7 +57,7 @@ public class PermissionValidator {
 
         if (!isAuthor && !isAdmin) {
             throw new PermissionDeniedException(
-                    "User with ID: " + user.getId() + " - does not have permission to delete this comment.");
+                    PermissionDeniedException.ErrorType.USER_CANNOT_DELETE_COMMENT, user.getId());
         }
     }
 }

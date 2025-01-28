@@ -3,7 +3,7 @@ package org.example.tms.filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.tms.exception.custom.JwtAuthenticationException;
+import org.example.tms.exception.JwtAuthenticationException;
 import org.example.tms.service.JwtBlacklistService;
 import org.example.tms.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
@@ -124,6 +124,7 @@ public class JwtAuthenticationFilterTest {
 
         JwtAuthenticationException exception = assertThrows(JwtAuthenticationException.class,
                 () -> jwtAuthenticationFilter.doFilterInternal(request, response, filterChain));
-        assertEquals("Unexpected error during JWT authentication", exception.getMessage());
+        assertEquals("Unexpected error during JWT authentication: java.lang.RuntimeException: Unexpected Error",
+                exception.getMessage());
     }
 }

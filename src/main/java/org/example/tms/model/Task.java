@@ -1,6 +1,7 @@
 package org.example.tms.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class Task extends BaseEntity {
 
     @Size(max = 255)
     @Column(name = "title", nullable = false)
-    @NotNull
+    @NotBlank
     private String title;
 
     @Size(max = 500)
@@ -52,17 +53,22 @@ public class Task extends BaseEntity {
     private List<TaskAssignee> taskAssignees = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "task")
     private List<Comment> comments = new ArrayList<>();
 
     @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = createdAt;
+    }
+
     @PreUpdate
-    public void updateTimestamps() {
+    public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 }

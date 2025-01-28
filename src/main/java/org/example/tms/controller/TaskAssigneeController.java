@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tms.dto.requests.create.CreateTaskAssigneeRequestDto;
 import org.example.tms.dto.responses.TaskAssigneeResponseDto;
 import org.example.tms.service.TaskAssigneeService;
+import org.example.tms.service.UriService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,7 @@ import java.net.URI;
 @RequestMapping("/api/tasks-assignees")
 @RequiredArgsConstructor
 public class TaskAssigneeController {
+    private final UriService uriService;
     private final TaskAssigneeService taskAssigneeService;
 
     @Operation(
@@ -37,7 +39,9 @@ public class TaskAssigneeController {
         log.info("Task with ID: {} successfully assigned to User with ID: {}", request.getTaskId(),
                 request.getAssigneeId());
 
-        return ResponseEntity.created(URI.create("/api/tasks-assignees/" + response.getId()))
+        String resourceUri = uriService.createTaskAssigneeUri(response.id());
+
+        return ResponseEntity.created(URI.create(resourceUri))
                 .body(response);
     }
 }

@@ -12,7 +12,6 @@ import org.example.tms.dto.responses.AuthenticationResponseDto;
 import org.example.tms.service.AuthenticationService;
 import org.example.tms.service.JwtBlacklistService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Authentication", description = "Endpoints for User authentication and token management")
@@ -30,13 +29,12 @@ public class AuthenticationController {
             tags = {"Authentication"}
     )
     @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponseDto> register(@Valid @RequestBody RegisterRequestDto request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthenticationResponseDto register(@Valid @RequestBody RegisterRequestDto request) {
         AuthenticationResponseDto response = authenticationService.register(request);
-
         log.info("User registered successfully: {}", request.getEmail());
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
+        return response;
     }
 
     @Operation(
@@ -45,13 +43,13 @@ public class AuthenticationController {
             tags = {"Authentication"}
     )
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponseDto> authenticate(
+    @ResponseStatus(HttpStatus.OK)
+    public AuthenticationResponseDto authenticate(
             @Valid @RequestBody AuthenticationRequestDto request) {
         AuthenticationResponseDto response = authenticationService.authenticate(request);
-
         log.info("User successfully authenticated");
 
-        return ResponseEntity.ok(response);
+        return response;
     }
 
     @Operation(
@@ -66,15 +64,12 @@ public class AuthenticationController {
             example = "Bearer <your_token>"
     )
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@RequestHeader("Authorization") String token) {
         String tokenValue = token.substring(7);
 
         jwtBlacklistService.addTokenToBlacklist(tokenValue);
-
         log.info("The User has successfully logged out. Token added to blacklist");
-
-        return ResponseEntity.noContent()
-                .build();
     }
 
     @Operation(
@@ -89,12 +84,12 @@ public class AuthenticationController {
             example = "<your_refresh_token>"
     )
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthenticationResponseDto> refreshToken(
+    @ResponseStatus(HttpStatus.OK)
+    public AuthenticationResponseDto refreshToken(
             @RequestHeader("X-Refresh-Token") String refreshToken) {
         AuthenticationResponseDto response = authenticationService.refreshToken(refreshToken);
-
         log.info("Successfully refreshed token for User.");
 
-        return ResponseEntity.ok(response);
+        return response;
     }
 }
