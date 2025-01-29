@@ -24,7 +24,7 @@ public class ValidationExceptionMessageBuilder {
      * @return a string containing the concatenated error messages for all fields
      */
     public String buildValidationErrorMessage(List<FieldError> fieldErrors) {
-        StringBuilder errorMessage = new StringBuilder("Validation failed for fields: ");
+        var errorMessage = new StringBuilder("Validation failed for fields: ");
         for (FieldError fieldError : fieldErrors) {
             errorMessage.append(fieldError.getField())
                     .append(" (")

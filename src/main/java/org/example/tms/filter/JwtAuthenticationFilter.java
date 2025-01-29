@@ -20,6 +20,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static org.example.tms.exception.JwtAuthenticationException.ErrorType;
+
 /**
  * JWT Authentication Filter for intercepting and validating JWT tokens in HTTP requests.
  * This filter extracts the JWT token from the Authorization header, validates its authenticity
@@ -77,13 +79,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            throw new JwtAuthenticationException(JwtAuthenticationException.ErrorType.JWT_AUTH_IO_ERROR, e);
+            throw new JwtAuthenticationException(ErrorType.JWT_AUTH_IO_ERROR, e);
         } catch (Exception e) {
             log.error("Unexpected error: {}", e.getMessage(), e);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            throw new JwtAuthenticationException(JwtAuthenticationException.ErrorType.JWT_AUTH_UNEXPECTED_ERROR, e);
+            throw new JwtAuthenticationException(ErrorType.JWT_AUTH_UNEXPECTED_ERROR, e);
         }
     }
 
@@ -122,7 +124,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @param request     the HTTP request
      */
     private void setAuthentication(UserDetails userDetails, HttpServletRequest request) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+        var authToken = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext()

@@ -16,5 +16,7 @@ public class DataSourceProperties {
 
     @NotBlank
     private String password;
+
+    @NotBlank
     private String driverClassName;
 }

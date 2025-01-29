@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -54,7 +55,7 @@ public class SecurityConfig {
                             .authenticated()
                             .requestMatchers(HttpMethod.DELETE, "/api/comments/**")
                             .authenticated()
-                            .requestMatchers("/swagger-ui/**", "/api-docs/**")
+                            .requestMatchers("/swagger-ui/**", "/api-docs/**", "/openapi.yaml/**")
                             .permitAll()
                             .anyRequest()
                             .authenticated())
@@ -72,8 +73,8 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        var configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of(
                 "Authorization", "Content-Type", "Accept", "Refresh-Token"
@@ -81,7 +82,7 @@ public class SecurityConfig {
         configuration.setExposedHeaders(List.of("Authorization", "Refresh-Token"));
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

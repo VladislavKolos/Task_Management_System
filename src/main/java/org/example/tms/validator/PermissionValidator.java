@@ -7,6 +7,8 @@ import org.example.tms.model.User;
 import org.example.tms.model.enums.UserRole;
 import org.springframework.stereotype.Component;
 
+import static org.example.tms.exception.PermissionDeniedException.ErrorType;
+
 /**
  * Validator for checking User permissions related to tasks and comments.
  * This class contains methods to validate whether a User has appropriate permissions
@@ -36,8 +38,7 @@ public class PermissionValidator {
                         .equals(user.getId()));
 
         if (!isAssignee) {
-            throw new PermissionDeniedException(PermissionDeniedException.ErrorType.USER_NOT_ASSIGNEE_OF_TASK,
-                    user.getId());
+            throw new PermissionDeniedException(ErrorType.USER_NOT_ASSIGNEE_OF_TASK, user.getId());
         }
     }
 
@@ -56,8 +57,7 @@ public class PermissionValidator {
         boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;
 
         if (!isAuthor && !isAdmin) {
-            throw new PermissionDeniedException(
-                    PermissionDeniedException.ErrorType.USER_CANNOT_DELETE_COMMENT, user.getId());
+            throw new PermissionDeniedException(ErrorType.USER_CANNOT_DELETE_COMMENT, user.getId());
         }
     }
 }

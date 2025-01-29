@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.example.tms.exception.EntitySaveException.ErrorType;
+
 /**
  * Service implementation for managing comments.
  * Provides methods for CRUD operations on comments and validation logic.
@@ -89,7 +91,7 @@ public class CommentServiceImpl implements CommentService {
         return Optional.of(comment)
                 .map(commentRepository::save)
                 .map(commentMapper::toCommentResponseDto)
-                .orElseThrow(() -> new EntitySaveException(EntitySaveException.ErrorType.COMMENT_SAVE_ERROR));
+                .orElseThrow(() -> new EntitySaveException(ErrorType.COMMENT_SAVE_ERROR));
     }
 
     /**

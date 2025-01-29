@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.example.tms.exception.EntitySaveException.ErrorType;
+
 /**
  * Service implementation for managing tasks.
  * Provides functionality to create, update, delete and retrieve tasks with support for paginated results
@@ -136,7 +138,7 @@ public class TaskServiceImpl implements TaskService {
                 .map(taskMapper::toTaskForCreate)
                 .map(taskRepository::save)
                 .map(taskMapper::toTaskResponseDto)
-                .orElseThrow(() -> new EntitySaveException(EntitySaveException.ErrorType.TASK_SAVE_ERROR));
+                .orElseThrow(() -> new EntitySaveException(ErrorType.TASK_SAVE_ERROR));
     }
 
     /**
@@ -198,7 +200,7 @@ public class TaskServiceImpl implements TaskService {
         return Optional.of(task)
                 .map(taskRepository::save)
                 .map(taskMapper::toTaskResponseDto)
-                .orElseThrow(() -> new EntitySaveException(EntitySaveException.ErrorType.TASK_SAVE_ERROR));
+                .orElseThrow(() -> new EntitySaveException(ErrorType.TASK_SAVE_ERROR));
     }
 
     /**

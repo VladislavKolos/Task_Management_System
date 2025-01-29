@@ -71,7 +71,7 @@ public class AuthenticationService {
         User user = userService.getUserByEmail(username);
 
         if (!jwtService.isRefreshTokenValid(refreshToken)) {
-            throw new InvalidRefreshTokenException();
+            throw new InvalidRefreshTokenException(refreshToken);
         }
 
         return createAuthenticationResponse(user);

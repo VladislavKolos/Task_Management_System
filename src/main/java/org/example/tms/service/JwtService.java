@@ -173,8 +173,8 @@ public class JwtService {
      */
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, int expirationMillis,
                                  String key) {
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + expirationMillis);
+        var now = new Date();
+        var expiration = new Date(now.getTime() + expirationMillis);
 
         return Jwts.builder()
                 .setClaims(extraClaims)

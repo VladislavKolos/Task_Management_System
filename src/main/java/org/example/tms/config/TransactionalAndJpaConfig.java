@@ -23,7 +23,7 @@ public class TransactionalAndJpaConfig {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+        var factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(dataSource());
         factoryBean.setPackagesToScan("org.example.tms.model");
         factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
@@ -34,7 +34,7 @@ public class TransactionalAndJpaConfig {
 
     @Bean
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        var dataSource = new DriverManagerDataSource();
         dataSource.setUrl(dataSourceProperties.getUrl());
         dataSource.setUsername(dataSourceProperties.getUsername());
         dataSource.setPassword(dataSourceProperties.getPassword());
@@ -48,7 +48,7 @@ public class TransactionalAndJpaConfig {
 
     @Bean
     public JpaTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        var transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
         return transactionManager;
     }

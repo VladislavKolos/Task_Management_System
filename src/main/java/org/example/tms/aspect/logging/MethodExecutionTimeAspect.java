@@ -21,9 +21,9 @@ public class MethodExecutionTimeAspect {
      */
     @Around("@annotation(org.example.tms.aspect.logging.annotation.ExecutionTime)")
     public Object logExecutionTime(ProceedingJoinPoint proceedingJoinPoint) {
-        String methodName = proceedingJoinPoint.getSignature()
+        var methodName = proceedingJoinPoint.getSignature()
                 .toShortString();
-        var startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
         if (log.isDebugEnabled()) {
             log.debug("Execution of method '{}' started at: {}", methodName, startTime);
@@ -40,8 +40,8 @@ public class MethodExecutionTimeAspect {
             throw new MethodExecutionException(methodName, e);
 
         } finally {
-            var endTime = System.currentTimeMillis();
-            var duration = endTime - startTime;
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
 
             if (log.isDebugEnabled()) {
                 log.debug("Execution of method '{}' ended at: {} (Duration: {} ms)", methodName, endTime, duration);
