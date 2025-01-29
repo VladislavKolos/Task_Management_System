@@ -3,7 +3,7 @@ package org.example.tms.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.tms.dto.requests.create.CreateTaskAssigneeRequestDto;
 import org.example.tms.dto.responses.TaskAssigneeResponseDto;
-import org.example.tms.exception.custom.TaskAssigneeNotFoundException;
+import org.example.tms.exception.TaskAssigneeNotFoundException;
 import org.example.tms.mapper.TaskAssigneeMapper;
 import org.example.tms.model.TaskAssignee;
 import org.example.tms.repository.TaskAssigneeRepository;
@@ -43,9 +43,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         return Optional.of(taskAssignee)
                 .map(taskAssigneeRepository::save)
                 .map(taskAssigneeMapper::toTaskAssigneeResponseDto)
-                .orElseThrow(() -> new TaskAssigneeNotFoundException(
-                        "User and task not found with IDs: " + request.getAssigneeId() + " and " +
-                                request.getTaskId()));
+                .orElseThrow(() -> new TaskAssigneeNotFoundException(request.getAssigneeId(), request.getTaskId()));
     }
 
     /**

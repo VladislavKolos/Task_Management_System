@@ -1,9 +1,9 @@
 package org.example.tms.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tms.annotation.ExecutionTime;
+import org.example.tms.aspect.logging.annotation.ExecutionTime;
 import org.example.tms.dto.responses.UserResponseDto;
-import org.example.tms.exception.custom.UserNotFoundException;
+import org.example.tms.exception.UserNotFoundException;
 import org.example.tms.mapper.UserMapper;
 import org.example.tms.model.User;
 import org.example.tms.repository.UserRepository;
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User getUserEntityById(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     /**
@@ -61,8 +61,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User with this email: " + email + " was not found in database"));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     /**
@@ -78,6 +77,6 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto getUserById(UUID id) {
         return userRepository.findById(id)
                 .map(userMapper::toUserResponseDto)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 }

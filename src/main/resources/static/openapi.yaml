@@ -1,0 +1,495 @@
+openapi: 3.0.3
+info:
+  title: Task Management API
+  description: API for managing authentication, comments, tasks, and task assignees
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+
+paths:
+  /auth/signup:
+    post:
+      summary: User registration
+      description: Registers a new User and returns an authentication response.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequestDto'
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponseDto'
+
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticates a User and returns an authentication response.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationRequestDto'
+      responses:
+        "200":
+          description: User successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponseDto'
+
+  /auth/logout:
+    post:
+      summary: User logout
+      description: Logs out the User by adding the token to the blacklist.
+      tags:
+        - Authentication
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT token of the authenticated User
+          example: "Bearer <your_token>"
+      responses:
+        "204":
+          description: The User has successfully logged out
+
+  /auth/refresh-token:
+    post:
+      summary: Refresh token
+      description: Refreshes the User's JWT using a valid refresh token.
+      tags:
+        - Authentication
+      parameters:
+        - name: X-Refresh-Token
+          in: header
+          required: true
+          description: The refresh token for the User
+          example: "<your_refresh_token>"
+      responses:
+        "200":
+          description: Successfully refreshed token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponseDto'
+
+  /comments:
+    post:
+      summary: Add a new comment
+      description: Adds a new comment to a specific task.
+      tags:
+        - Comments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequestDto'
+      responses:
+        "201":
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponseDto'
+
+  /comments/{id}:
+    get:
+      summary: Get comment by ID
+      description: Fetches a comment by its unique ID.
+      tags:
+        - Comments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the comment
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "200":
+          description: Comment fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponseDto'
+
+    delete:
+      summary: Delete a comment
+      description: Deletes a comment by its unique ID.
+      tags:
+        - Comments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the comment
+          example: "123e4567-e89b-12d3-a456-426614174002"
+      responses:
+        "204":
+          description: Comment deleted successfully
+
+  /comments/task/{taskId}:
+    get:
+      summary: Get comments by task ID
+      description: Fetches all comments associated with a specific task.
+      tags:
+        - Comments
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: Unique identifier of the task
+          example: "123e4567-e89b-12d3-a456-426614174001"
+        - name: pageable
+          in: query
+          required: false
+          description: Pagination and sorting information
+          schema:
+            type: string
+          example: "{ \"page\": 0, \"size\": 10, \"sort\": \"task,desc\" }"
+      responses:
+        "200":
+          description: Fetched comments for the task
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponseDto'
+
+  /api/tasks-assignees:
+    post:
+      summary: Assign a task to a user
+      description: Assigns a task to a specific user by providing the task ID and the assignee user ID.
+      tags:
+        - Task Assignees
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskAssigneeRequestDto'
+      responses:
+        "201":
+          description: Task assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAssigneeResponseDto'
+
+  /api/tasks/{id}:
+    get:
+      summary: Get task by ID
+      description: Fetches a task by its unique ID.
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the task
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "200":
+          description: Task fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponseDto'
+
+    put:
+      summary: Update a task
+      description: Updates a task by its unique ID.
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the task
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequestDto'
+      responses:
+        "200":
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponseDto'
+
+    delete:
+      summary: Delete a task
+      description: Deletes a task by its unique ID.
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the task
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "204":
+          description: Task deleted successfully
+
+  /api/tasks/author/{authorId}:
+    get:
+      summary: Get tasks by author ID
+      description: Fetches all tasks created by a specific author.
+      tags:
+        - Tasks
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          description: Unique identifier of the author
+          example: "123e4567-e89b-12d3-a456-426614174001"
+        - name: pageable
+          in: query
+          required: false
+          description: Pagination and sorting information
+          example: "{ \"page\": 0, \"size\": 10, \"sort\": \"createdAt,desc\" }"
+      responses:
+        "200":
+          description: Fetched tasks for the author
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponseDto'
+
+  /api/tasks/assignee/{assigneeId}:
+    get:
+      summary: Get tasks by assignee ID
+      description: Fetches all tasks assigned to a specific user.
+      tags:
+        - Tasks
+      parameters:
+        - name: assigneeId
+          in: path
+          required: true
+          description: Unique identifier of the assignee
+          example: "123e4567-e89b-12d3-a456-426614174002"
+        - name: pageable
+          in: query
+          required: false
+          description: Pagination and sorting information
+          example: "{ \"page\": 0, \"size\": 10, \"sort\": \"createdAt,desc\" }"
+      responses:
+        "200":
+          description: Fetched tasks for the assignee
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponseDto'
+
+  /api/tasks:
+    get:
+      summary: Get all tasks
+      description: Fetches all tasks with pagination and sorting.
+      tags:
+        - Tasks
+      parameters:
+        - name: pageable
+          in: query
+          required: false
+          description: Pagination and sorting information
+          example: "{ \"page\": 0, \"size\": 10, \"sort\": \"createdAt,desc\" }"
+      responses:
+        "200":
+          description: Fetched all tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponseDto'
+
+    post:
+      summary: Create a new task
+      description: Creates a new task with the provided details.
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequestDto'
+      responses:
+        "201":
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponseDto'
+
+components:
+  schemas:
+    RegisterRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    AuthenticationRequestDto:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    AuthenticationResponseDto:
+      type: object
+      properties:
+        token:
+          type: string
+        refreshToken:
+          type: string
+
+    CommentResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        task:
+          $ref: '#/components/schemas/TaskResponseDto'
+        author:
+          $ref: '#/components/schemas/UserResponseDto'
+
+    TaskResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        author:
+          $ref: '#/components/schemas/UserResponseDto'
+        taskAssignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskAssigneeResponseDto'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponseDto'
+
+    CreateCommentRequestDto:
+      type: object
+      properties:
+        content:
+          type: string
+        taskId:
+          type: string
+
+    CreateTaskRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        authorId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    UpdateTaskRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        authorId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TaskAssigneeResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        task:
+          $ref: '#/components/schemas/TaskResponseDto'
+        assignee:
+          $ref: '#/components/schemas/UserResponseDto'
+        assignedAt:
+          type: string
+          format: date-time
+
+    CreateTaskAssigneeRequestDto:
+      type: object
+      properties:
+        taskId:
+          type: string
+        assigneeId:
+          type: string
+        assignedAt:
+          type: string
+          format: date-time
+
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string

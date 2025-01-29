@@ -4,6 +4,7 @@ import org.example.tms.dto.requests.AuthenticationRequestDto;
 import org.example.tms.model.User;
 import org.example.tms.model.enums.UserRole;
 import org.example.tms.repository.UserRepository;
+import org.example.tms.validator.constraint.AuthRequestValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -2,6 +2,7 @@ package org.example.tms.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -28,12 +29,12 @@ import java.util.List;
 public class User extends BaseEntity implements UserDetails {
 
     @Email
-    @NotNull
+    @NotBlank
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Size(min = 8, max = 256)
-    @NotNull
+    @NotBlank
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -43,7 +44,7 @@ public class User extends BaseEntity implements UserDetails {
     private UserRole role;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -73,6 +74,11 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 }
 

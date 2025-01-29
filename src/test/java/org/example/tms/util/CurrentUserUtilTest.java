@@ -1,6 +1,6 @@
 package org.example.tms.util;
 
-import org.example.tms.exception.custom.UnauthenticatedClientAccessException;
+import org.example.tms.exception.UnauthenticatedClientAccessException;
 import org.example.tms.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;

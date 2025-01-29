@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.tms.annotation.custom.TaskExists;
-import org.example.tms.annotation.custom.UserExists;
-import org.example.tms.annotation.custom.ValidTimestamp;
+import org.example.tms.validator.constraint.annotation.TaskExists;
+import org.example.tms.validator.constraint.annotation.UserExists;
+import org.example.tms.validator.constraint.annotation.ValidTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

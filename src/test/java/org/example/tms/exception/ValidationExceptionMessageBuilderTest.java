@@ -1,5 +1,6 @@
 package org.example.tms.exception;
 
+import org.example.tms.exception.builder.ValidationExceptionMessageBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.FieldError;

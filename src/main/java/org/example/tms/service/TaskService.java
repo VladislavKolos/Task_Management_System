@@ -7,11 +7,9 @@ import org.example.tms.model.Task;
 import org.example.tms.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-@Component
 public interface TaskService {
     Task getTaskEntityById(UUID id);
 

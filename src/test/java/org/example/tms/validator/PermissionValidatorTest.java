@@ -1,6 +1,6 @@
 package org.example.tms.validator;
 
-import org.example.tms.exception.custom.PermissionDeniedException;
+import org.example.tms.exception.PermissionDeniedException;
 import org.example.tms.model.Comment;
 import org.example.tms.model.Task;
 import org.example.tms.model.TaskAssignee;

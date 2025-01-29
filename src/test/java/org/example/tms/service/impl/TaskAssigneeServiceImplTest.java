@@ -4,8 +4,8 @@ import org.example.tms.dto.requests.create.CreateTaskAssigneeRequestDto;
 import org.example.tms.dto.responses.TaskAssigneeResponseDto;
 import org.example.tms.dto.responses.TaskResponseDto;
 import org.example.tms.dto.responses.UserResponseDto;
-import org.example.tms.exception.custom.TaskNotFoundException;
-import org.example.tms.exception.custom.UserNotFoundException;
+import org.example.tms.exception.TaskNotFoundException;
+import org.example.tms.exception.UserNotFoundException;
 import org.example.tms.mapper.TaskAssigneeMapper;
 import org.example.tms.model.Task;
 import org.example.tms.model.TaskAssignee;
@@ -112,7 +112,7 @@ public class TaskAssigneeServiceImplTest {
 
         TaskAssigneeResponseDto result = taskAssigneeService.assignTaskToUser(createTaskAssigneeRequestDto);
 
-        assertEquals(taskAssigneeResponseDto.getId(), result.getId());
+        assertEquals(taskAssigneeResponseDto.id(), result.id());
         verify(taskService).getTaskEntityById(TASK_ID);
         verify(userService).getUserEntityById(ASSIGNEE_ID);
     }

@@ -1,9 +1,8 @@
 package org.example.tms.config;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tms.exception.custom.AuthenticationManagerConfigurationException;
-import org.example.tms.exception.custom.UserNotFoundException;
-import org.example.tms.repository.UserRepository;
+import org.example.tms.exception.AuthenticationManagerConfigurationException;
+import org.example.tms.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,11 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class AuthenticationConfig {
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        var provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService());
         provider.setPasswordEncoder(passwordEncoder());
 
@@ -30,8 +29,7 @@ public class AuthenticationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User with email: " + email + " not found"));
+        return userService::getUserByEmail;
     }
 
     @Bean
@@ -39,7 +37,7 @@ public class AuthenticationConfig {
         try {
             return config.getAuthenticationManager();
         } catch (Exception ex) {
-            throw new AuthenticationManagerConfigurationException("Failed to configure AuthenticationManager", ex);
+            throw new AuthenticationManagerConfigurationException(ex);
         }
     }
 

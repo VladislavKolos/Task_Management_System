@@ -1,6 +1,7 @@
 package org.example.tms.validator.custom;
 
 import org.example.tms.repository.TaskRepository;
+import org.example.tms.validator.constraint.TaskExistsValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
