@@ -3,7 +3,7 @@ package org.example.tms.service.impl;
 import org.example.tms.dto.requests.create.CreateTaskRequestDto;
 import org.example.tms.dto.requests.update.UpdateTaskRequestDto;
 import org.example.tms.dto.responses.TaskResponseDto;
-import org.example.tms.exception.custom.TaskNotFoundException;
+import org.example.tms.exception.TaskNotFoundException;
 import org.example.tms.mapper.TaskMapper;
 import org.example.tms.model.Task;
 import org.example.tms.model.User;

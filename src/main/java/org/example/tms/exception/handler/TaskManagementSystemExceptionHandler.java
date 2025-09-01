@@ -4,10 +4,9 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.tms.exception.ApiException;
-import org.example.tms.exception.ValidationExceptionMessageBuilder;
-import org.example.tms.exception.custom.*;
-import org.springframework.beans.factory.annotation.Value;
+import org.example.tms.exception.*;
+import org.example.tms.exception.builder.ValidationExceptionMessageBuilder;
+import org.example.tms.exception.dto.ApiExceptionDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -26,303 +25,183 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class TaskManagementSystemExceptionHandler {
-
-    @Value("${app.support.email}")
-    private String supportEmail;
     private final ValidationExceptionMessageBuilder validationExceptionMessageBuilder;
 
     @ExceptionHandler(MethodExecutionException.class)
-    public ResponseEntity<ApiException> handleMethodExecutionException(
+    public ResponseEntity<ApiExceptionDto> handleMethodExecutionException(
             MethodExecutionException ex, WebRequest request) {
-
-        String message = "An error occurred during method execution.";
-
         log.error("Method execution failed at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new MethodExecutionException(message), HttpStatus.INTERNAL_SERVER_ERROR,
-                getRequestPath(request), "Method Execution Error");
+        return buildExceptionResponse(ErrorMessage.METHOD_EXECUTION_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(EntitySaveException.class)
-    public ResponseEntity<ApiException> handleEntitySaveException(
+    public ResponseEntity<ApiExceptionDto> handleEntitySaveException(
             EntitySaveException ex, WebRequest request) {
-
-        String message = "Unable to save your object at the moment. Please try again later.";
-
         log.error("Failed to save object at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new EntitySaveException(message), HttpStatus.INTERNAL_SERVER_ERROR,
-                getRequestPath(request),
-                "Entity Save Error");
+        return buildExceptionResponse(ErrorMessage.ENTITY_SAVE_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(PermissionDeniedException.class)
-    public ResponseEntity<ApiException> handlePermissionDeniedException(
+    public ResponseEntity<ApiExceptionDto> handlePermissionDeniedException(
             PermissionDeniedException ex, WebRequest request) {
-
-        String message = "You do not have permission to perform this action.";
-
         log.warn("Permission denied at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new PermissionDeniedException(message), HttpStatus.FORBIDDEN,
-                getRequestPath(request),
-                "Access Denied");
+        return buildExceptionResponse(ErrorMessage.PERMISSION_DENIED_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(AuthenticationManagerConfigurationException.class)
-    public ResponseEntity<ApiException> handleAuthenticationManagerConfigurationException(
+    public ResponseEntity<ApiExceptionDto> handleAuthenticationManagerConfigurationException(
             AuthenticationManagerConfigurationException ex, WebRequest request) {
-
-        String message = "An unexpected error occurred. Please contact support: " + supportEmail;
-
         log.error("Error at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new AuthenticationManagerConfigurationException(message),
-                HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
-                "Unexpected Error");
+        return buildExceptionResponse(ErrorMessage.AUTHENTICATION_MANAGER_CONFIGURATION_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(BlacklistedTokenAccessDeniedException.class)
-    public ResponseEntity<ApiException> handleBlacklistedTokenAccessDeniedException(
+    public ResponseEntity<ApiExceptionDto> handleBlacklistedTokenAccessDeniedException(
             BlacklistedTokenAccessDeniedException ex, WebRequest request) {
-
-        String message = "Your session is no longer valid. Please login again.";
-
         log.warn("Blacklisted token access attempt at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new BlacklistedTokenAccessDeniedException(message), HttpStatus.FORBIDDEN,
-                getRequestPath(request),
-                "Invalid Session");
+        return buildExceptionResponse(ErrorMessage.BLACKLISTED_TOKEN_ACCESS_DENIED_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(InvalidRefreshTokenException.class)
-    public ResponseEntity<ApiException> handleInvalidRefreshTokenException(
+    public ResponseEntity<ApiExceptionDto> handleInvalidRefreshTokenException(
             InvalidRefreshTokenException ex, WebRequest request) {
-
-        String message = "Session expired or invalid. Please login again.";
-
         log.warn("Invalid refresh token used at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new InvalidRefreshTokenException(message), HttpStatus.UNAUTHORIZED,
-                getRequestPath(request),
-                "Session Error");
+        return buildExceptionResponse(ErrorMessage.INVALID_REFRESH_TOKEN_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(JwtAuthenticationException.class)
-    public ResponseEntity<ApiException> handleJwtAuthenticationException(
+    public ResponseEntity<ApiExceptionDto> handleJwtAuthenticationException(
             JwtAuthenticationException ex, WebRequest request) {
-
-        String message = "Authentication failed. Please try again or contact support: " + supportEmail;
-
         log.error("Authentication error at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new JwtAuthenticationException(message), HttpStatus.UNAUTHORIZED,
-                getRequestPath(request),
-                "Authentication Error");
+        return buildExceptionResponse(ErrorMessage.JWT_AUTHENTICATION_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(NullUserObjectException.class)
-    public ResponseEntity<ApiException> handleNullUserObjectException(
+    public ResponseEntity<ApiExceptionDto> handleNullUserObjectException(
             NullUserObjectException ex, WebRequest request) {
-
-        String message = "The user object is null. Please ensure all required data is provided.";
-
         log.error("Null user object encountered at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new NullUserObjectException(message), HttpStatus.INTERNAL_SERVER_ERROR,
-                getRequestPath(request),
-                "Unexpected Error");
+        return buildExceptionResponse(ErrorMessage.NULL_USER_OBJECT_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(SecurityFilterConfigurationException.class)
-    public ResponseEntity<ApiException> handleSecurityFilterConfigurationException(
+    public ResponseEntity<ApiExceptionDto> handleSecurityFilterConfigurationException(
             SecurityFilterConfigurationException ex, WebRequest request) {
-
-        String message = "An unexpected error occurred. Please contact support: " + supportEmail;
-
         log.error("Security filter configuration error at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new SecurityFilterConfigurationException(message),
-                HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
-                "Unexpected Error");
+        return buildExceptionResponse(ErrorMessage.SECURITY_FILTER_CONFIGURATION_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(UnauthenticatedClientAccessException.class)
-    public ResponseEntity<ApiException> handleUnauthenticatedClientAccessException(
+    public ResponseEntity<ApiExceptionDto> handleUnauthenticatedClientAccessException(
             UnauthenticatedClientAccessException ex, WebRequest request) {
-
-        String message = "You need to log in to access this resource.";
-
         log.warn("Unauthenticated access attempt at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new UnauthenticatedClientAccessException(message), HttpStatus.UNAUTHORIZED,
-                getRequestPath(request),
-                "Access Denied");
+        return buildExceptionResponse(ErrorMessage.UNAUTHENTICATED_CLIENT_ACCESS_ERROR, getRequestPath(request));
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ApiException> handleUserNotFoundException(
-            UserNotFoundException ex, WebRequest request) {
-
-        String message = "The requested information was not found.";
-
+    @ExceptionHandler({UserNotFoundException.class,
+            TaskNotFoundException.class,
+            CommentNotFoundException.class,
+            TaskAssigneeNotFoundException.class})
+    public ResponseEntity<ApiExceptionDto> handleResourceNotFoundException(
+            RuntimeException ex, WebRequest request) {
         log.warn("User not found at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new UserNotFoundException(message), HttpStatus.NOT_FOUND, getRequestPath(request),
-                "Resource Not Found");
-    }
-
-    @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<ApiException> handleTaskNotFoundException(
-            TaskNotFoundException ex, WebRequest request) {
-
-        String message = "The requested information was not found.";
-
-        log.warn("Task not found at [{}]: {}", getRequestPath(request), ex.getMessage());
-
-        return buildExceptionResponse(new TaskNotFoundException(message), HttpStatus.NOT_FOUND, getRequestPath(request),
-                "Resource Not Found");
-    }
-
-    @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<ApiException> handleCommentNotFoundException(
-            CommentNotFoundException ex, WebRequest request) {
-
-        String message = "The requested information was not found.";
-
-        log.warn("Comment not found at [{}]: {}", getRequestPath(request), ex.getMessage());
-
-        return buildExceptionResponse(new CommentNotFoundException(message), HttpStatus.NOT_FOUND,
-                getRequestPath(request),
-                "Resource Not Found");
-    }
-
-    @ExceptionHandler(TaskAssigneeNotFoundException.class)
-    public ResponseEntity<ApiException> handleTaskAssigneeNotFoundException(
-            TaskAssigneeNotFoundException ex, WebRequest request) {
-
-        String message = "The requested information was not found.";
-
-        log.warn("TaskAssignee not found at [{}]: {}", getRequestPath(request), ex.getMessage());
-
-        return buildExceptionResponse(new TaskAssigneeNotFoundException(message), HttpStatus.NOT_FOUND,
-                getRequestPath(request),
-                "Resource Not Found");
+        return buildExceptionResponse(ErrorMessage.RESOURCE_NOT_FOUND_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiException> handleGeneralException(Exception ex, WebRequest request) {
-        String message = "An unexpected error occurred. Please try again later or contact support: " + supportEmail;
-
+    public ResponseEntity<ApiExceptionDto> handleGeneralException(Exception ex, WebRequest request) {
         log.error("Unexpected error occurred at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
-                "Unexpected Error");
+        return buildExceptionResponse(ErrorMessage.ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiException> handleRuntimeException(RuntimeException ex, WebRequest request) {
-        String message = "A runtime error occurred. Please try again later or contact support: " + supportEmail;
-
+    public ResponseEntity<ApiExceptionDto> handleRuntimeException(RuntimeException ex, WebRequest request) {
         log.error("Runtime exception occurred at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
-
-        return buildExceptionResponse(new RuntimeException(message), HttpStatus.INTERNAL_SERVER_ERROR,
-                getRequestPath(request), "Runtime Error");
+        return buildExceptionResponse(ErrorMessage.RUNTIME_ERROR, getRequestPath(request));
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiException> handleValidationErrors(MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ApiExceptionDto> handleValidationErrors(MethodArgumentNotValidException ex,
+                                                                  WebRequest request) {
         BindingResult result = ex.getBindingResult();
 
         List<FieldError> fieldErrors = result.getFieldErrors();
         if (!fieldErrors.isEmpty()) {
             String errorMessage = validationExceptionMessageBuilder.buildValidationErrorMessage(fieldErrors);
-
             log.warn("Validation error at [{}]: {}", getRequestPath(request), errorMessage);
 
-            return buildExceptionResponse(new Exception(errorMessage), HttpStatus.BAD_REQUEST, getRequestPath(request),
-                    "Validation Error");
+            return buildExceptionResponse(ErrorMessage.METHOD_ARGUMENT_NOT_VALID_ERROR.getHttpStatus(),
+                    getRequestPath(request), errorMessage);
         }
-        String message = "Validation failed. Ensure all fields are correctly filled.";
-
         log.warn("Constraint violation occurred at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.BAD_REQUEST, getRequestPath(request),
-                "Validation Error");
+        return buildExceptionResponse(ErrorMessage.METHOD_ARGUMENT_NOT_VALID_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiException> handleConstraintViolationException(ConstraintViolationException ex,
-                                                                           WebRequest request) {
-        String message = "Validation failed. Ensure all fields are correctly filled.";
-
+    public ResponseEntity<ApiExceptionDto> handleConstraintViolationException(ConstraintViolationException ex,
+                                                                              WebRequest request) {
         log.warn("Constraint violation occurred at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.BAD_REQUEST, getRequestPath(request),
-                "Validation Error");
+        return buildExceptionResponse(ErrorMessage.CONSTRAINT_VIOLATION_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiException> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
-        String message = "Operation cannot be completed due to the current system state. Please check the data or try again later.";
-
+    public ResponseEntity<ApiExceptionDto> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
         log.error("Illegal state exception at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.FORBIDDEN, getRequestPath(request),
-                "Illegal State");
+        return buildExceptionResponse(ErrorMessage.ILLEGAL_STATE_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ApiException> handleNoSuchElementException(NoSuchElementException ex, WebRequest request) {
-        String message = "The requested resource was not found.";
-
+    public ResponseEntity<ApiExceptionDto> handleNoSuchElementException(NoSuchElementException ex, WebRequest request) {
         log.warn("No such element found at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.NOT_FOUND, getRequestPath(request),
-                "Resource Not Found");
+        return buildExceptionResponse(ErrorMessage.NO_SUCH_ELEMENT_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ApiException> handleNullPointerException(NullPointerException ex, WebRequest request) {
-        String message = "An internal error occurred. Please try again later.";
-
+    public ResponseEntity<ApiExceptionDto> handleNullPointerException(NullPointerException ex, WebRequest request) {
         log.error("Null pointer exception at [{}]: {}", getRequestPath(request), ex.getMessage(), ex);
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.INTERNAL_SERVER_ERROR, getRequestPath(request),
-                "Internal Error");
+        return buildExceptionResponse(ErrorMessage.NULL_POINTER_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiException> handleIllegalArgumentException(IllegalArgumentException ex,
-                                                                       WebRequest request) {
-        String message = "Invalid input provided. Please verify the data and try again.";
+    public ResponseEntity<ApiExceptionDto> handleIllegalArgumentException(IllegalArgumentException ex,
+                                                                          WebRequest request) {
 
         log.warn("Illegal argument exception at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.BAD_REQUEST, getRequestPath(request),
-                "Invalid Argument");
+        return buildExceptionResponse(ErrorMessage.ILLEGAL_ARGUMENT_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ApiException> handleExpiredJwtException(ExpiredJwtException ex, WebRequest request) {
-        String message = "Your session has expired. Please log in again to continue.";
-
+    public ResponseEntity<ApiExceptionDto> handleExpiredJwtException(ExpiredJwtException ex, WebRequest request) {
         log.warn("Expired JWT exception at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.UNAUTHORIZED, getRequestPath(request),
-                "Session Expired");
+        return buildExceptionResponse(ErrorMessage.EXPIRED_JWT_ERROR, getRequestPath(request));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ApiException> handleNoResourceFoundException(NoResourceFoundException ex,
-                                                                       WebRequest request) {
-        String message = "The requested resource could not be found. Please check your request and try again.";
+    public ResponseEntity<ApiExceptionDto> handleNoResourceFoundException(NoResourceFoundException ex,
+                                                                          WebRequest request) {
 
         log.warn("No resource found exception at [{}]: {}", getRequestPath(request), ex.getMessage());
 
-        return buildExceptionResponse(new Exception(message), HttpStatus.NOT_FOUND, getRequestPath(request),
-                "Resource Not Found");
+        return buildExceptionResponse(ErrorMessage.NO_RESOURCE_FOUND_ERROR, getRequestPath(request));
     }
 
     private String getRequestPath(WebRequest request) {
@@ -330,14 +209,18 @@ public class TaskManagementSystemExceptionHandler {
                 .replace("uri=", "");
     }
 
-    private ResponseEntity<ApiException> buildExceptionResponse(Exception ex, HttpStatus status, String path,
-                                                                String exceptionType) {
-        log.error("Error occurred: {} at path: {}", ex.getMessage(), path, ex);
+    private ResponseEntity<ApiExceptionDto> buildExceptionResponse(ErrorMessage errorMessage, String path) {
+        return buildExceptionResponse(errorMessage.getHttpStatus(), path, errorMessage.getMessage());
+    }
 
-        ApiException apiException = ApiException.builder()
+    private ResponseEntity<ApiExceptionDto> buildExceptionResponse(HttpStatus status,
+                                                                   String path, String customMessage) {
+        log.error("Error occurred: {} at path: {}", customMessage, path);
+
+        ApiExceptionDto apiException = ApiExceptionDto.builder()
                 .status(status.value())
-                .message(ex.getMessage())
-                .error(exceptionType)
+                .message(customMessage)
+                .error(status.getReasonPhrase())
                 .path(path)
                 .timestamp(LocalDateTime.now())
                 .build();

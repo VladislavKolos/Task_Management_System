@@ -1,21 +1,14 @@
 package org.example.tms.dto.responses;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.example.tms.model.enums.UserRole;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserResponseDto {
-    private UUID id;
-    private String email;
-    private UserRole role;
-    private LocalDateTime createdAt;
+public record UserResponseDto(UUID id,
+                              String email,
+                              UserRole role,
+                              LocalDateTime createdAt) {
 }

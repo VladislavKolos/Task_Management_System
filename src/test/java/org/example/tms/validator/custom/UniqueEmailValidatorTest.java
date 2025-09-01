@@ -2,6 +2,7 @@ package org.example.tms.validator.custom;
 
 import org.example.tms.dto.requests.RegisterRequestDto;
 import org.example.tms.repository.UserRepository;
+import org.example.tms.validator.constraint.UniqueEmailValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

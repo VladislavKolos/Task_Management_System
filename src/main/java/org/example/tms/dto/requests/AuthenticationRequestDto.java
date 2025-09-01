@@ -1,13 +1,13 @@
 package org.example.tms.dto.requests;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.tms.annotation.custom.ValidAuthRequest;
+import org.example.tms.validator.constraint.annotation.ValidAuthRequest;
 
 @Data
 @Builder
@@ -17,10 +17,10 @@ import org.example.tms.annotation.custom.ValidAuthRequest;
 public class AuthenticationRequestDto {
 
     @Email
-    @NotNull
+    @NotBlank
     private String email;
 
     @Size(min = 8, max = 256)
-    @NotNull
+    @NotBlank
     private String password;
 }

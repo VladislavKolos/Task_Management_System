@@ -28,6 +28,7 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      SERVICE_URL_DEFAULT_ZONE: ${SERVICE_URL_DEFAULT_ZONE}
     volumes:
       - ./logs:/app/logs
     networks:

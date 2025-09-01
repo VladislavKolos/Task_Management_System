@@ -3,7 +3,7 @@ package org.example.tms.service;
 import org.example.tms.dto.requests.AuthenticationRequestDto;
 import org.example.tms.dto.requests.RegisterRequestDto;
 import org.example.tms.dto.responses.AuthenticationResponseDto;
-import org.example.tms.exception.custom.InvalidRefreshTokenException;
+import org.example.tms.exception.InvalidRefreshTokenException;
 import org.example.tms.model.User;
 import org.example.tms.model.enums.UserRole;
 import org.junit.jupiter.api.Test;

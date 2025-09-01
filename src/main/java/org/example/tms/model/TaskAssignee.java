@@ -27,5 +27,10 @@ public class TaskAssignee extends BaseEntity {
     private User assignee;
 
     @Column(name = "assigned_at", nullable = false)
-    private LocalDateTime assignedAt = LocalDateTime.now();
+    private LocalDateTime assignedAt;
+
+    @PrePersist
+    public void onCreate() {
+        assignedAt = LocalDateTime.now();
+    }
 }

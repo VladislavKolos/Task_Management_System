@@ -1,11 +1,11 @@
 package org.example.tms.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.tms.annotation.ExecutionTime;
+import org.example.tms.aspect.logging.annotation.ExecutionTime;
 import org.example.tms.dto.requests.create.CreateCommentRequestDto;
 import org.example.tms.dto.responses.CommentResponseDto;
-import org.example.tms.exception.custom.CommentNotFoundException;
-import org.example.tms.exception.custom.EntitySaveException;
+import org.example.tms.exception.CommentNotFoundException;
+import org.example.tms.exception.EntitySaveException;
 import org.example.tms.mapper.CommentMapper;
 import org.example.tms.model.Comment;
 import org.example.tms.model.Task;
@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.example.tms.exception.EntitySaveException.ErrorType;
 
 /**
  * Service implementation for managing comments.
@@ -50,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponseDto getCommentById(UUID id) {
         return commentRepository.findById(id)
                 .map(commentMapper::toCommentResponseDto)
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + id));
+                .orElseThrow(() -> new CommentNotFoundException(id));
     }
 
     /**
@@ -89,7 +91,7 @@ public class CommentServiceImpl implements CommentService {
         return Optional.of(comment)
                 .map(commentRepository::save)
                 .map(commentMapper::toCommentResponseDto)
-                .orElseThrow(() -> new EntitySaveException("Failed to save comment."));
+                .orElseThrow(() -> new EntitySaveException(ErrorType.COMMENT_SAVE_ERROR));
     }
 
     /**
@@ -102,7 +104,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void deleteComment(UUID id) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + id));
+                .orElseThrow(() -> new CommentNotFoundException(id));
         User author = CurrentUserUtil.getCurrentUser();
 
         permissionValidator.validateCommentOwnershipOrAdmin(author, comment);

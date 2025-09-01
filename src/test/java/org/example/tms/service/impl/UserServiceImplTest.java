@@ -1,7 +1,7 @@
 package org.example.tms.service.impl;
 
 import org.example.tms.dto.responses.UserResponseDto;
-import org.example.tms.exception.custom.UserNotFoundException;
+import org.example.tms.exception.UserNotFoundException;
 import org.example.tms.mapper.UserMapper;
 import org.example.tms.model.User;
 import org.example.tms.model.enums.UserRole;

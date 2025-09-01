@@ -1,11 +1,13 @@
 package org.example.tms.validator;
 
-import org.example.tms.exception.custom.PermissionDeniedException;
+import org.example.tms.exception.PermissionDeniedException;
 import org.example.tms.model.Comment;
 import org.example.tms.model.Task;
 import org.example.tms.model.User;
 import org.example.tms.model.enums.UserRole;
 import org.springframework.stereotype.Component;
+
+import static org.example.tms.exception.PermissionDeniedException.ErrorType;
 
 /**
  * Validator for checking User permissions related to tasks and comments.
@@ -36,7 +38,7 @@ public class PermissionValidator {
                         .equals(user.getId()));
 
         if (!isAssignee) {
-            throw new PermissionDeniedException("User with ID: " + user.getId() + " - is not an assignee of the task.");
+            throw new PermissionDeniedException(ErrorType.USER_NOT_ASSIGNEE_OF_TASK, user.getId());
         }
     }
 
@@ -55,8 +57,7 @@ public class PermissionValidator {
         boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;
 
         if (!isAuthor && !isAdmin) {
-            throw new PermissionDeniedException(
-                    "User with ID: " + user.getId() + " - does not have permission to delete this comment.");
+            throw new PermissionDeniedException(ErrorType.USER_CANNOT_DELETE_COMMENT, user.getId());
         }
     }
 }
